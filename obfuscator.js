@@ -11,25 +11,7 @@ class ClassName {
     this.newClassesCount = 0;
     this._initData(data);
     this._initSetOfCodes();
-    this._sortData();
-  }
-
-  get firstLetters() {
-    return this._firstLetters;
-  }
-
-  set firstLetters(alphabet) {
-    this._firstLetter = alphabet;
-    this._firstLetterBase = this._firstLetters.length;
-  }
-
-  get nextLetters() {
-    return this._nextLetters;
-  }
-
-  set nextLetters(alphabet) {
-    this._nextLetters = alphabet;
-    this._mainBase = this._nextLetters.length;
+    this._mergeData();
   }
 
   get names() {
@@ -87,7 +69,7 @@ class ClassName {
     }
   }
 
-  _sortData() {
+  _mergeData() {
     var data = [];
     var j = 0;
     for (var className in this._data) {
