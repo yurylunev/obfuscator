@@ -1,27 +1,41 @@
 /**
+ * @description Класс объектов, которые обфусцируют CSS классы из массива data
  * @param {Array} data – массив CSS классов
  */
-
 class ClassName {
   constructor(data) {
-    this._firstLetters = 'abcdefghijklmnopqrstuvwxyz'.split('');
-    this._nextLetters = 'abcdefghijklmnopqrstuvwxyz0123456789-_'.split('');
-    this._mainBase = this._nextLetters.length;
-    this._firstLetterBase = this._firstLetters.length;
-    this.newClassesCount = 0;
-    this._initData(data);
+    this._firstLetters = 'abcdefghijklmnopqrstuvwxyz'.split('');            // Алфавит первых букв в названии нового класса
+    this._nextLetters = 'abcdefghijklmnopqrstuvwxyz0123456789-_'.split(''); // Алфавит непервых букв в названии нового класса
+    this._mainBase = this._nextLetters.length;      // Количество непервых букв в названии нового класса
+    this._firstLetterBase = this._firstLetters.length; // Количество первых букв в названии нового класса
+    this.newClassesCount = 0;   // Общее количество классов, получившееся после минимизации
+    this._initData(data);       // Метод первичной инициализации массива data
     this._initSetOfCodes();
     this._mergeData();
   }
 
+  /**
+   * @description Метод возвращающий объект с минимизированными и обфусцированными классами
+   * @returns {Object}
+   */
   get names() {
     var data = {};
-    this._data.forEach((row)=> {
-      data[row.oldName] = row.newName;
-    });
-    return data;
+    if (!this.error.message) {
+      this._data.forEach((row)=> {
+        data[row.oldName] = row.newName;
+      });
+      return data;
+    } else {
+      return this.error
+    }
   }
 
+  /**
+   * @description Генератор массива числовых кодов для создания новых имён классов.
+   * Метод генерирует от 0 до максимального числа классов, получившихся после минимизации,
+   * с помощью метода _decompose.
+   *
+   */
   _initSetOfCodes() {
     this._setOfCodes = [];
     for (var i = 0; i < this.newClassesCount; i++) {
@@ -29,6 +43,13 @@ class ClassName {
     }
   }
 
+  /**
+   * @description Метод, раскладывающий входное число в набор чисел, особенностью которых является то,
+   * что первое число кодирует первую букву (значение не должно превышать _firstLetterBase),
+   * а второе и далее кодирует остальные буквы (значение не должно превышать _mainBase).
+   * @param largeInteger
+   * @returns {Array}
+   */
   _decompose(largeInteger) {
     var setOfSmallIntegers = [];
     var r = [];
@@ -50,11 +71,16 @@ class ClassName {
     return setOfSmallIntegers;
   }
 
+  /**
+   * @param data
+   * @description Минимизация массива классов путём создания объекта с ключами в виде названий
+   * и подсчетом их частоты. Также, считается общее количество уникальных классов - newClassesCount
+   */
   _initData(data) {
     if (Array.isArray(data)) {
       this._data = {};
       this.newClassesCount = 0;
-      this.error = 'Нет ошибок.';
+      this.error = {message: null};
       data.forEach((className) => {
         if (this._data.hasOwnProperty(className)) {
           this._data[className]['times']++;
@@ -65,10 +91,14 @@ class ClassName {
         }
       });
     } else {
-      this.error = "Ошибка: некорректно задан входной массив классов";
+      this.error = {message: "Ошибка: некорректно задан входной массив классов"};
     }
   }
 
+  /**
+   * @description Совмещение массива кодов с минимизированным набором классов, и придание буквенных имён классам
+   *
+   */
   _mergeData() {
     var data = [];
     var j = 0;
